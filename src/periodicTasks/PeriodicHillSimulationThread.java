@@ -3,6 +3,7 @@ package periodicTasks;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.realtime.AsynchronouslyInterruptedException;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RealtimeThread;
 
@@ -20,7 +21,7 @@ public class PeriodicHillSimulationThread extends RealtimeThread {
 	}
 
 	@Override
-	public void run() {
+	public void run(){
 		while (waitForNextPeriod() || !stop) {
 			double currentSpeed = controlSystem.getSpeed();
 			controlSystem.changeCarSpeed(generateHillFactor(currentSpeed));
@@ -39,5 +40,7 @@ public class PeriodicHillSimulationThread extends RealtimeThread {
 	public void stopThread(){
 		stop = true;
 	}
+	
+	
 
 }

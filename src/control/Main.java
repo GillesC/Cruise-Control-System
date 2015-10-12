@@ -1,5 +1,7 @@
 package control;
+import javax.realtime.AsynchronouslyInterruptedException;
 import javax.realtime.HighResolutionTime;
+import javax.realtime.Interruptible;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RelativeTime;
 
@@ -29,15 +31,22 @@ public class Main{
 		RelativeTime cost = new RelativeTime(10,0);
 		RelativeTime deadline = new RelativeTime(SPEED_WRITER_MS,0);
 		
-		CostOverrunHandler costOverrunHandler = new CostOverrunHandler();
+		AsynchronouslyInterruptedException aiException = new AsynchronouslyInterruptedException();
+		
+		CostOverrunHandler costOverrunHandler = new CostOverrunHandler(aiException);
 		MissDeadlineHandler missDeadlineHandler = new MissDeadlineHandler();
 	
 		PeriodicSpeedWriter writer = new PeriodicSpeedWriter(new PeriodicParameters(start, period, cost, deadline, costOverrunHandler, missDeadlineHandler), cSystem);
 		costOverrunHandler.setThread(writer);
 		missDeadlineHandler.setThread(writer);
-		writer.start();
 		
-		new PeriodicResistanceSimulationThread(new PeriodicParameters(new RelativeTime(RESISTANCE_SIMULATION_MS,0)), cSystem).start();
+		PeriodicResistanceSimulationThread resistanceSimulationThread =	new PeriodicResistanceSimulationThread(new PeriodicParameters(new RelativeTime(RESISTANCE_SIMULATION_MS,0)), cSystem);
+		
+		
+		
+		aiException.doInterruptible((Interruptible) resistanceSimulationThread);
+		
+		writer.start();
 		
 		new PeriodicHillSimulationThread(new PeriodicParameters(new RelativeTime(HILL_SIMULATION_MS,0)), cSystem).start();
 	}

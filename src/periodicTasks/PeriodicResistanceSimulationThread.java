@@ -1,12 +1,14 @@
 package periodicTasks;
 
+import javax.realtime.AsynchronouslyInterruptedException;
+import javax.realtime.Interruptible;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RealtimeThread;
 
 import control.ControlSystem;
 import utils.CSSUtils;
 
-public class PeriodicResistanceSimulationThread extends RealtimeThread {
+public class PeriodicResistanceSimulationThread extends RealtimeThread implements Interruptible {
 	private ControlSystem controlSystem = null;
 	private boolean stop = false;
 	private static final double MIN_FACTOR = 0.975, MAX_FACTOR = 0.995;
@@ -17,7 +19,8 @@ public class PeriodicResistanceSimulationThread extends RealtimeThread {
 	}
 
 	@Override
-	public void run() {
+	public void run(AsynchronouslyInterruptedException exception) throws AsynchronouslyInterruptedException{
+		System.out.println("Resistance is futile!");
 		while (waitForNextPeriod() && !stop) {
 			double currentSpeed = controlSystem.getSpeed();
 
@@ -28,7 +31,7 @@ public class PeriodicResistanceSimulationThread extends RealtimeThread {
 
 			System.out.println("Changed speed from: " + currentSpeed + " to: " + controlSystem.getSpeed());
 		}
-
+		
 	}
 
 	/*
@@ -57,5 +60,14 @@ public class PeriodicResistanceSimulationThread extends RealtimeThread {
 	public void stopThread(){
 		stop = true;
 	}
+
+	@Override
+	public void interruptAction(AsynchronouslyInterruptedException exception) {
+		exception.clear();
+		System.err.println("Gelukt!");
+		
+	}
+
+
 
 }
