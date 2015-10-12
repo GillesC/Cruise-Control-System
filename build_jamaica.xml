@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="control.Main" basedir="." default="build_control.Main">
+  <!-- aicas GmbH, Karlsruhe -->
+  <!-- Jamaica Buildfile for application 'control.Main' -->
+  <!-- ANT_EDITOR_VERSION=1.2.1.201409041500 -->
+  <taskdef name="jamaicabuilder" classname="com.aicas.jamaica.tools.ant.JamaicaTask" classpath="/usr/local/jamaica-6.4-2/lib/JamaicaTools.jar"/>
+  
+  
+  <target name="build_control.Main" unless="jamaica.executable_of_build_control.Main_available">
+    <jamaicabuilder jamaica="/usr/local/jamaica-6.4-2">
+      <target value="linux-x86_64" enabled="true"/>
+      <main value="control.Main" enabled="true"/>
+      <tmpdir value="tmp" enabled="true"/>
+      <classpath value="bin" enabled="true"/>
+    </jamaicabuilder>
+    <echo>
+      The executable has been created successfully:
+        /home/ubuntudev/workspace/CruiseControlSystem/Main
+      You can launch it using the &quot;Overview&quot; page in this editor.
+    </echo>
+  </target>
+  
+  <target name="launch_control.Main">
+    <available property="jamaica.executable_of_build_control.Main_available" file="Main"/>
+    <antcall target="build_control.Main"/>
+    <exec executable="Main" resolveexecutable="true"/>
+  </target>
+  
+</project>
