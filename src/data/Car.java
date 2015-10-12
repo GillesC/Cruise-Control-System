@@ -1,7 +1,9 @@
-package control;
+package data;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import control.ControlSystem;
 
 public class Car {
 	public static final double MAX_SPEED = 200;

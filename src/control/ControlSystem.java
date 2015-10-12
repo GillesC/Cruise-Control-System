@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RelativeTime;
 
+import data.Car;
 import periodicTasks.PeriodicSpeedThread;
 
 public class ControlSystem {

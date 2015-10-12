@@ -4,8 +4,8 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import control.Car;
 import control.ControlSystem;
+import data.Car;
 import sun.security.krb5.internal.crypto.crc32;
 
 public class InputHandlerThread extends Thread{

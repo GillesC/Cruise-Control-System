@@ -2,6 +2,8 @@ package control;
 import javax.realtime.HighResolutionTime;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RelativeTime;
+
+import data.Car;
 import inputHandler.InputHandlerThread;
 import interruptHandlers.CostOverrunHandler;
 import interruptHandlers.MissDeadlineHandler;
