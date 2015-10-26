@@ -11,6 +11,7 @@ import control.ControlSystem;
 public class PeriodicSpeedWriter extends RealtimeThread{
 	private ControlSystem controlSystem =null;
 	private boolean stop;
+	private static int interval = 10;
 	
 	public PeriodicSpeedWriter(PeriodicParameters pp, ControlSystem control) {
 		super(null,pp);
@@ -19,11 +20,13 @@ public class PeriodicSpeedWriter extends RealtimeThread{
 	
 	@Override
 	public void run() {
-		while(waitForNextPeriod() && !stop){
+		while(!stop){
+			waitForNextPeriod();
 			Logger.getGlobal().log(Level.INFO, "Current speed: "+controlSystem.getSpeed());
 			System.out.println("Current speed: "+controlSystem.getSpeed());
 			
-			for(int i=0; i<10000000; i++){}
+			for(int i=0; i<interval; i++){}
+			interval *= 10;
 		}
 	}
 	

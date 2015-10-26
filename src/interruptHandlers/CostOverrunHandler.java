@@ -5,12 +5,14 @@ import javax.realtime.AsynchronouslyInterruptedException;
 import javax.realtime.Interruptible;
 import javax.realtime.RealtimeThread;
 
+import com.sun.media.sound.RealTimeSequencerProvider;
+
+import periodicTasks.PeriodicResistanceSimulationThread;
+
 public class CostOverrunHandler extends AsyncEventHandler{
-	private RealtimeThread thread;
-	private AsynchronouslyInterruptedException aie;
+	private AsynchronouslyInterruptedException aInterruptedException;
 	
-	public CostOverrunHandler(AsynchronouslyInterruptedException aie) {
-		this.aie = aie;
+	public CostOverrunHandler() {
 	}
 	
 	
@@ -18,13 +20,14 @@ public class CostOverrunHandler extends AsyncEventHandler{
 	public void handleAsyncEvent() {
 		super.handleAsyncEvent();
 		System.err.println("Cost overrun");
-		thread.schedulePeriodic();
-		//target.interrupt();
-		aie.fire();
+		aInterruptedException.fire();
 	}
 
-	public void setThread(RealtimeThread thread) {
-		this.thread = thread;
+
+
+	public void setTarget(AsynchronouslyInterruptedException aInterruptedException) {
+		this.aInterruptedException = aInterruptedException;
+		
 	}
 
 }

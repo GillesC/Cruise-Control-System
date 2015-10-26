@@ -13,6 +13,7 @@ public class InputHandlerThread extends Thread{
 	private static Scanner sc = new Scanner(System.in);
 	private ControlSystem controlSystem = null;
 	private Car car;
+	private boolean stop = false;
 	
 	public InputHandlerThread(ControlSystem controlSystem, Car car) {
 		this.controlSystem = controlSystem;
@@ -21,7 +22,7 @@ public class InputHandlerThread extends Thread{
 
 	public void run(){
 		String command = null;
-		while(!(command=sc.nextLine()).equals("BYE")){
+		while(!(command=sc.nextLine()).equals("BYE") && !stop){
 				System.out.println("CMD: "+command);
 				activateCommands(command);
 			}
@@ -45,6 +46,10 @@ public class InputHandlerThread extends Thread{
 		else if("rem".equals(cmd)) car.brake();
 		else if("gas".equals(cmd)) car.speedUp();
 		
+	}
+	
+	public void stopThread(){
+		stop = true;
 	}
 
 }

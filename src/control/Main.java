@@ -9,6 +9,7 @@ import data.Car;
 import inputHandler.InputHandlerThread;
 import interruptHandlers.CostOverrunHandler;
 import interruptHandlers.MissDeadlineHandler;
+import interruptHandlers.PeriodicResistanceInterruptible;
 import periodicTasks.PeriodicHillSimulationThread;
 import periodicTasks.PeriodicResistanceSimulationThread;
 import periodicTasks.PeriodicSpeedWriter;
@@ -24,31 +25,47 @@ public class Main{
 
 		car.setControlSystem(cSystem);
 		
-		new InputHandlerThread(cSystem, car).start();
+		InputHandlerThread inputHandlerThread = new InputHandlerThread(cSystem, car);
 		
 		HighResolutionTime start = new RelativeTime(0,0);
 		RelativeTime period = new RelativeTime(SPEED_WRITER_MS,0);
 		RelativeTime cost = new RelativeTime(10,0);
 		RelativeTime deadline = new RelativeTime(SPEED_WRITER_MS,0);
 		
-		AsynchronouslyInterruptedException aiException = new AsynchronouslyInterruptedException();
 		
-		CostOverrunHandler costOverrunHandler = new CostOverrunHandler(aiException);
+		CostOverrunHandler costOverrunHandler = new CostOverrunHandler();
 		MissDeadlineHandler missDeadlineHandler = new MissDeadlineHandler();
 	
-		PeriodicSpeedWriter writer = new PeriodicSpeedWriter(new PeriodicParameters(start, period, cost, deadline, costOverrunHandler, missDeadlineHandler), cSystem);
-		costOverrunHandler.setThread(writer);
+		PeriodicSpeedWriter writer = new PeriodicSpeedWriter(new PeriodicParameters(start, period, cost, deadline, costOverrunHandler, missDeadlineHandler), cSystem);		
+		
+		AsynchronouslyInterruptedException aInterruptedException = new AsynchronouslyInterruptedException();
+		
+		PeriodicResistanceSimulationThread resistanceSimulationThread =	new PeriodicResistanceSimulationThread(new PeriodicParameters(new RelativeTime(RESISTANCE_SIMULATION_MS,0)), 
+				cSystem, new PeriodicResistanceInterruptible(cSystem));
+
+		PeriodicHillSimulationThread hillSimulationThread = new PeriodicHillSimulationThread(new PeriodicParameters(new RelativeTime(HILL_SIMULATION_MS,0)), cSystem);
+		
 		missDeadlineHandler.setThread(writer);
+		costOverrunHandler.setTarget(resistanceSimulationThread.aInterruptedException);
 		
-		PeriodicResistanceSimulationThread resistanceSimulationThread =	new PeriodicResistanceSimulationThread(new PeriodicParameters(new RelativeTime(RESISTANCE_SIMULATION_MS,0)), cSystem);
+		/*
+		 * Feasibility test
+		 */
 		
+		if(hillSimulationThread.getScheduler().isFeasible()) System.out.println("Feasible!");
+		else System.out.println("NOT Feasible!");
 		
+		/*
+		 * Starting Threads
+		 */
 		
-		aiException.doInterruptible((Interruptible) resistanceSimulationThread);
-		
+		inputHandlerThread.start();
+		resistanceSimulationThread.start();
+		hillSimulationThread.start();
 		writer.start();
 		
-		new PeriodicHillSimulationThread(new PeriodicParameters(new RelativeTime(HILL_SIMULATION_MS,0)), cSystem).start();
+		
+		
 	}
 
 }

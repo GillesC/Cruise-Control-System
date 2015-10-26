@@ -26,7 +26,8 @@ public class PeriodicSpeedThread extends RealtimeThread{
 	
 	@Override
 	public void run() {
-		while(waitForNextPeriod() && !stop){
+		while(!stop){
+			waitForNextPeriod();
 			double currentSpeed = controlSystem.getSpeed();
 			double speedDiff = desiredSpeed - currentSpeed;
 			//System.err.println("SPEED DIIF: "+speedDiff);
