@@ -40,7 +40,7 @@ public class ControlSystem {
 
 	public void decelerate(double desiredSpeed) {
 		cssSpeed = desiredSpeed;
-		System.err.println("Disred speed is : "+desiredSpeed);
+		System.err.println("Desired speed is : "+desiredSpeed);
 		changeSpeed(cssSpeed);
 	}
 

@@ -25,8 +25,11 @@ public class PeriodicSpeedWriter extends RealtimeThread{
 			Logger.getGlobal().log(Level.INFO, "Current speed: "+controlSystem.getSpeed());
 			System.out.println("Current speed: "+controlSystem.getSpeed());
 			
-			for(int i=0; i<interval; i++){}
+			/*
+			 * for(int i=0; i<interval; i++){}
+			 
 			interval *= 10;
+			*/
 		}
 	}
 	

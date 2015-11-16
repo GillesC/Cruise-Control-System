@@ -4,6 +4,9 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.realtime.PeriodicTimer;
+import javax.realtime.RelativeTime;
+
 import control.ControlSystem;
 import data.Car;
 import sun.security.krb5.internal.crypto.crc32;
@@ -14,6 +17,7 @@ public class InputHandlerThread extends Thread{
 	private ControlSystem controlSystem = null;
 	private Car car;
 	private boolean stop = false;
+	private PeriodicTimer timer;
 	
 	public InputHandlerThread(ControlSystem controlSystem, Car car) {
 		this.controlSystem = controlSystem;
@@ -46,10 +50,17 @@ public class InputHandlerThread extends Thread{
 		else if("rem".equals(cmd)) car.brake();
 		else if("gas".equals(cmd)) car.speedUp();
 		
+		else if("t".equals(cmd)) timer.reschedule(new RelativeTime(5000,0));
+		
 	}
 	
 	public void stopThread(){
 		stop = true;
+	}
+
+	public void setTimer(PeriodicTimer awakeTimer) {
+		this.timer=awakeTimer;
+		
 	}
 
 }
