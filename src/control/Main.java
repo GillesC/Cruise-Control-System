@@ -9,6 +9,8 @@ import javax.realtime.PeriodicTimer;
 import javax.realtime.RelativeTime;
 import javax.realtime.Timed;
 
+import com.aicas.tools.compiler.common.StaticMethod;
+
 import data.Car;
 import inputHandler.InputHandlerThread;
 import interruptHandlers.CostOverrunHandler;
@@ -21,21 +23,29 @@ import periodicTasks.PeriodicSpeedWriter;
 public class Main{
 	private static final int SPEED_WRITER_MS = 1000;
 	private static final int RESISTANCE_SIMULATION_MS = 1000, HILL_SIMULATION_MS = 1000;
+	private static  Timed awakeTimed = new Timed(new RelativeTime(5000,0));
 
 	public static void main(String[] args) {
 		Car car = new Car();
 		
-		ControlSystem cSystem = new ControlSystem(car);
+		final ControlSystem cSystem = new ControlSystem(car);
 
 		car.setControlSystem(cSystem);
 		
-		InputHandlerThread inputHandlerThread = new InputHandlerThread(cSystem, car);
+		/*
+		 * AEI
+		 */
+		AsynchronouslyInterruptedException aie = new AsynchronouslyInterruptedException();
+		AsynchronouslyInterruptedException deactivateSystemAIE = new AsynchronouslyInterruptedException();
+		
+		InputHandlerThread inputHandlerThread = new InputHandlerThread(cSystem, car, deactivateSystemAIE);
+		
 		
 		/*
 		 * HANDLERS
 		 */
 	
-		CostOverrunHandler costOverrunHandler = new CostOverrunHandler();
+		CostOverrunHandler costOverrunHandler = new CostOverrunHandler(aie);
 		MissDeadlineHandler missDeadlineHandler = new MissDeadlineHandler();
 		TimeHandler timeHandler  = new TimeHandler();
 		
@@ -52,29 +62,33 @@ public class Main{
 		 * TIMER/TIMED
 		 */
 		PeriodicTimer awakeTimer = new PeriodicTimer(new RelativeTime(5000, 0), new RelativeTime(5000, 0), timeHandler);
-		final Timed awakeTimed = new Timed(new RelativeTime(2000, 0));
-		awakeTimed.doInterruptible(new Interruptible() {
-			
-			@Override
-			public void run(AsynchronouslyInterruptedException exception) throws AsynchronouslyInterruptedException {
-				System.out.println("TIMED");
-				awakeTimed.resetTime(new RelativeTime(2000,0));
-				
+		
+		(new Thread() {
+			public void run() {
+				awakeTimed = new Timed(new RelativeTime(3000, 0));
+
+				awakeTimed.doInterruptible(new Interruptible() {
+
+					@Override
+					public void run(AsynchronouslyInterruptedException exception)
+							throws AsynchronouslyInterruptedException {
+						while (true) {
+						}
+
+					}
+
+					@Override
+					public void interruptAction(AsynchronouslyInterruptedException exception) {
+						// TODO Auto-generated method stub
+						System.err.println("TIMED");
+						// remmen
+						cSystem.changeCarSpeed(0);
+					}
+				});
 			}
-			
-			@Override
-			public void interruptAction(AsynchronouslyInterruptedException exception) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		}).start();
+	
 		
-		
-		
-		/*
-		 * AEI
-		 */
-		AsynchronouslyInterruptedException aie = new AsynchronouslyInterruptedException();
 	
 		/*
 		 * THREADS
@@ -82,38 +96,58 @@ public class Main{
 		PeriodicSpeedWriter writer = new PeriodicSpeedWriter(new PeriodicParameters(start, period, cost, deadline, costOverrunHandler, missDeadlineHandler), cSystem);		
 		
 		PeriodicResistanceSimulationThread resistanceSimulationThread =	new PeriodicResistanceSimulationThread(new PeriodicParameters(new RelativeTime(RESISTANCE_SIMULATION_MS,0)), 
-				cSystem, new PeriodicResistanceInterruptible(cSystem));
+				cSystem, new PeriodicResistanceInterruptible(cSystem), aie);
 
 		PeriodicHillSimulationThread hillSimulationThread = new PeriodicHillSimulationThread(new PeriodicParameters(new RelativeTime(HILL_SIMULATION_MS,0)), cSystem);
 		
 		/*
 		 * SETTERS
 		 */
-		
+	
 		missDeadlineHandler.setThread(writer);
-		costOverrunHandler.setTarget(aie);
 		
 		timeHandler.setTimer(awakeTimer);
 		timeHandler.setCarSystem(cSystem);
 		
 		inputHandlerThread.setTimer(awakeTimer);
+		inputHandlerThread.setTimed(awakeTimed);
 		
 		/*
 		 * Feasibility test
 		 */
 		
-		if(hillSimulationThread.getScheduler().isFeasible()) System.out.println("Feasible!");
+		if(hillSimulationThread.getScheduler().isFeasible()){
+			System.out.println("Feasible!");
+			/*
+			 * Starting Threads
+			 */
+			
+			inputHandlerThread.start();
+			resistanceSimulationThread.start();
+			hillSimulationThread.start();
+			writer.start();
+			awakeTimer.start();
+			
+			deactivateSystemAIE.doInterruptible(
+			new Interruptible(){
+
+				@Override
+				public void interruptAction(AsynchronouslyInterruptedException exception) {
+					cSystem.deactivate();
+					
+				}
+
+				@Override
+				public void run(AsynchronouslyInterruptedException exception)
+						throws AsynchronouslyInterruptedException {
+					while(true){}
+				}
+				
+			});
+		}
 		else System.out.println("NOT Feasible!");
 		
-		/*
-		 * Starting Threads
-		 */
 		
-		inputHandlerThread.start();
-		resistanceSimulationThread.start();
-		hillSimulationThread.start();
-		writer.start();
-		awakeTimer.start();
 		
 	}
 

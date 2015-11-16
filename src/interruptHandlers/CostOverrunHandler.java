@@ -12,7 +12,9 @@ import periodicTasks.PeriodicResistanceSimulationThread;
 public class CostOverrunHandler extends AsyncEventHandler{
 	private AsynchronouslyInterruptedException aInterruptedException;
 	
-	public CostOverrunHandler() {
+	public CostOverrunHandler(AsynchronouslyInterruptedException aInterruptedException) {
+		this.aInterruptedException = aInterruptedException;
+		
 	}
 	
 	
@@ -21,13 +23,6 @@ public class CostOverrunHandler extends AsyncEventHandler{
 		super.handleAsyncEvent();
 		System.err.println("Cost overrun");
 		aInterruptedException.fire();
-	}
-
-
-
-	public void setTarget(AsynchronouslyInterruptedException aInterruptedException) {
-		this.aInterruptedException = aInterruptedException;
-		
 	}
 
 }

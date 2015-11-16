@@ -27,6 +27,7 @@ public class ControlSystem {
 
 
 	public void deactivate() {
+		System.out.println("DEACTIVATE system");
 		for(PeriodicSpeedThread t: speedThreads){
 			t.stopThread();
 		}
@@ -68,7 +69,6 @@ public class ControlSystem {
 		PeriodicSpeedThread t = new PeriodicSpeedThread(new PeriodicParameters(new RelativeTime(500,0)), cssSpeed, this);
 		speedThreads.add(t);
 		t.start();
-		
 	}
 	
 

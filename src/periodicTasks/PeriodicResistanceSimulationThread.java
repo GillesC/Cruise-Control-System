@@ -20,28 +20,28 @@ public class PeriodicResistanceSimulationThread extends RealtimeThread{
 	private boolean stop = false;
 	private static final double MIN_FACTOR = 0.975, MAX_FACTOR = 0.995;
 	
-	public AsynchronouslyInterruptedException aInterruptedException;
+	public AsynchronouslyInterruptedException aie;
 	
 	private PeriodicResistanceInterruptible interruptible;
 	
-	public PeriodicResistanceSimulationThread(PeriodicParameters pp, ControlSystem control, PeriodicResistanceInterruptible interruptible) {
+	public PeriodicResistanceSimulationThread(PeriodicParameters pp, ControlSystem control, PeriodicResistanceInterruptible interruptible, AsynchronouslyInterruptedException aie) {
 		super(null, pp);
 		this.controlSystem = control;
-		this.aInterruptedException = new AsynchronouslyInterruptedException();
 		this.interruptible = interruptible;
+		this.aie = aie;
 	}
 
 	@Override
 	public void run() {
-		boolean OK;
 		while (!stop) {
 		waitForNextPeriod();
-		OK = aInterruptedException.doInterruptible(interruptible);
+		aie.doInterruptible(interruptible);
 		}
 	}
 	
 	public void stopThread() {
 		stop = true;
 	}
+	
 
 }

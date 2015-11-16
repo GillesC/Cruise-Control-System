@@ -4,8 +4,10 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.realtime.AsynchronouslyInterruptedException;
 import javax.realtime.PeriodicTimer;
 import javax.realtime.RelativeTime;
+import javax.realtime.Timed;
 
 import control.ControlSystem;
 import data.Car;
@@ -18,10 +20,13 @@ public class InputHandlerThread extends Thread{
 	private Car car;
 	private boolean stop = false;
 	private PeriodicTimer timer;
+	private AsynchronouslyInterruptedException aie;
+	private Timed timed;
 	
-	public InputHandlerThread(ControlSystem controlSystem, Car car) {
+	public InputHandlerThread(ControlSystem controlSystem, Car car, AsynchronouslyInterruptedException aie) {
 		this.controlSystem = controlSystem;
 		this.car = car;
+		this.aie = aie;
 	}
 
 	public void run(){
@@ -51,6 +56,9 @@ public class InputHandlerThread extends Thread{
 		else if("gas".equals(cmd)) car.speedUp();
 		
 		else if("t".equals(cmd)) timer.reschedule(new RelativeTime(5000,0));
+		else if("y".equals(cmd)) timed.resetTime(new RelativeTime(3000,0));
+		
+		else if("brake".equals(cmd) || "changeGear".equals(cmd) || "gasPedal".equals(cmd)) aie.fire();
 		
 	}
 	
@@ -61,6 +69,10 @@ public class InputHandlerThread extends Thread{
 	public void setTimer(PeriodicTimer awakeTimer) {
 		this.timer=awakeTimer;
 		
+	}
+
+	public void setTimed(Timed awakeTimed) {
+		this.timed = awakeTimed;
 	}
 
 }

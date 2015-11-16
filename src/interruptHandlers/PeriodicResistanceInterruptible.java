@@ -12,7 +12,6 @@ public class PeriodicResistanceInterruptible implements Interruptible{
 		private ControlSystem controlSystem = null;
 		private boolean stop = false;
 		private static final double MIN_FACTOR = 0.975, MAX_FACTOR = 0.995;
-		public AsynchronouslyInterruptedException aInterruptedException = AsynchronouslyInterruptedException.getGeneric();
 
 		public PeriodicResistanceInterruptible(ControlSystem control) {
 
@@ -50,9 +49,7 @@ public class PeriodicResistanceInterruptible implements Interruptible{
 
 		@Override
 		public void interruptAction(AsynchronouslyInterruptedException exception) {
-			if(aInterruptedException.clear()){
-				System.err.println("HANDLED!!!!!!!!!!!");
-			}
+			System.err.println("HANDLED!!!!!!!!!!!");
 		}
 
 
@@ -67,9 +64,6 @@ public class PeriodicResistanceInterruptible implements Interruptible{
 			controlSystem.changeCarSpeed((airFactor + rollFactor) / 2);
 
 			System.out.println("Changed speed from: " + currentSpeed + " to: " + controlSystem.getSpeed());
-			
-		
-			
 			
 		}
 		
