@@ -1,7 +1,6 @@
 package control;
 import javax.realtime.AsynchronouslyInterruptedException;
 import javax.realtime.HighResolutionTime;
-import javax.realtime.Interruptible;
 import javax.realtime.PeriodicParameters;
 import javax.realtime.RelativeTime;
 
@@ -63,8 +62,6 @@ public class Main{
 		resistanceSimulationThread.start();
 		hillSimulationThread.start();
 		writer.start();
-		
-		
 		
 	}
 
