@@ -74,7 +74,7 @@ public class Main{
 		/*
 		 * AEI
 		 */
-		AsynchronouslyInterruptedException aInterruptedException = new AsynchronouslyInterruptedException();
+		AsynchronouslyInterruptedException aie = new AsynchronouslyInterruptedException();
 	
 		/*
 		 * THREADS
@@ -91,7 +91,7 @@ public class Main{
 		 */
 		
 		missDeadlineHandler.setThread(writer);
-		costOverrunHandler.setTarget(resistanceSimulationThread.aInterruptedException);
+		costOverrunHandler.setTarget(aie);
 		
 		timeHandler.setTimer(awakeTimer);
 		timeHandler.setCarSystem(cSystem);
